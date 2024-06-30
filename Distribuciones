@@ -1,0 +1,49 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Cargar el archivo CSV
+file_path = '/mnt/data/datos_descargados.csv'
+df = pd.read_csv(file_path)
+
+# Cambiar nombres de columnas para facilitar la lectura
+df.columns = ['Edad', 'Anémico', 'Creatinine_Phosphokinase', 'Diabético', 'Ejection_Fraction', 
+              'High_Blood_Pressure', 'Platelets', 'Serum_Creatinine', 'Serum_Sodium', 'Género', 
+              'Fumador', 'Tiempo', 'Muerto']
+
+# 1. Graficar la distribución de edades con un histograma
+plt.figure(figsize=(10, 5))
+plt.hist(df['Edad'], bins=10, edgecolor='black')
+plt.title('Distribución de Edades')
+plt.xlabel('Edad')
+plt.ylabel('Frecuencia')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
+
+# 2. Graficar histogramas agrupados por hombre y mujer
+def plot_grouped_histogram(column, title, labels):
+    hombres = df[df['Género'] == 1][column].value_counts().sort_index()
+    mujeres = df[df['Género'] == 0][column].value_counts().sort_index()
+
+    index = hombres.index.union(mujeres.index)
+    hombres = hombres.reindex(index, fill_value=0)
+    mujeres = mujeres.reindex(index, fill_value=0)
+
+    bar_width = 0.4
+
+    plt.figure(figsize=(10, 5))
+    plt.bar(index - bar_width/2, hombres, width=bar_width, label='Hombres', align='edge')
+    plt.bar(index + bar_width/2, mujeres, width=bar_width, label='Mujeres', align='edge')
+
+    plt.title(title)
+    plt.xlabel('Categoría')
+    plt.ylabel('Frecuencia')
+    plt.xticks(index, labels, rotation=45)
+    plt.legend()
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
+
+# Histogramas agrupados
+plot_grouped_histogram('Anémico', 'Cantidad de Anémicos por Género', ['No Anémico', 'Anémico'])
+plot_grouped_histogram('Diabético', 'Cantidad de Diabéticos por Género', ['No Diabético', 'Diabético'])
+plot_grouped_histogram('Fumador', 'Cantidad de Fumadores por Género', ['No Fumador', 'Fumador'])
+plot_grouped_histogram('Muerto', 'Cantidad de Muertos por Género', ['Vivo', 'Muerto'])
